@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package websocket
+package WebSocket
 
 import (
 	"bytes"
@@ -20,9 +20,9 @@ import (
 
 // ErrBadHandshake is returned when the server response to opening handshake is
 // invalid.
-var ErrBadHandshake = errors.New("websocket: bad handshake")
+var ErrBadHandshake = errors.New("WebSocket: bad handshake")
 
-var errInvalidCompression = errors.New("websocket: invalid compression negotiation")
+var errInvalidCompression = errors.New("WebSocket: invalid compression negotiation")
 
 // NewClient creates a new client connection using the given net connection.
 // The URL u specifies the host and request URI. Use requestHeader to specify
@@ -147,7 +147,7 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 	}
 
 	if u.User != nil {
-		// User name and password are not allowed in websocket URIs.
+		// User name and password are not allowed in WebSocket URIs.
 		return nil, nil, errMalformedURL
 	}
 
@@ -180,7 +180,7 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 	// RFC examples. Although the capitalization shouldn't matter, there are
 	// servers that depend on it. The Header.Set method is not used because the
 	// method canonicalizes the header names.
-	req.Header["Upgrade"] = []string{"websocket"}
+	req.Header["Upgrade"] = []string{"WebSocket"}
 	req.Header["Connection"] = []string{"Upgrade"}
 	req.Header["Sec-WebSocket-Key"] = []string{challengeKey}
 	req.Header["Sec-WebSocket-Version"] = []string{"13"}
@@ -201,18 +201,18 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 			}
 		case k == "Upgrade" ||
 			k == "Connection" ||
-			k == "Sec-Websocket-Key" ||
-			k == "Sec-Websocket-Version" ||
+			k == "Sec-WebSocket-Key" ||
+			k == "Sec-WebSocket-Version" ||
 			k == "Pragma" ||
 			k == "Cache-Control" ||
 			k == "Cookie" ||
 			k == "Referer" ||
 			k == "Accept" ||
 			k == "Accept-Language" ||
-			k == "Sec-Websocket-Extensions" ||
-			(k == "Sec-Websocket-Protocol" && len(d.Subprotocols) > 0):
-			return nil, nil, errors.New("websocket: duplicate header not allowed: " + k)
-		case k == "Sec-Websocket-Protocol":
+			k == "Sec-WebSocket-Extensions" ||
+			(k == "Sec-WebSocket-Protocol" && len(d.Subprotocols) > 0):
+			return nil, nil, errors.New("WebSocket: duplicate header not allowed: " + k)
+		case k == "Sec-WebSocket-Protocol":
 			req.Header["Sec-WebSocket-Protocol"] = vs
 			default:
 			req.Header[k] = vs
@@ -220,7 +220,7 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 	}
 
 	if d.EnableCompression {
-		req.Header.Set("Sec-Websocket-Extensions", "permessage-deflate; server_no_context_takeover; client_no_context_takeover")
+		req.Header.Set("Sec-WebSocket-Extensions", "permessage-deflate; server_no_context_takeover; client_no_context_takeover")
 	}
 
 	var deadline time.Time
@@ -327,9 +327,9 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 	}
 
 	if resp.StatusCode != 101 ||
-		!strings.EqualFold(resp.Header.Get("Upgrade"), "websocket") ||
+		!strings.EqualFold(resp.Header.Get("Upgrade"), "WebSocket") ||
 		!strings.EqualFold(resp.Header.Get("Connection"), "upgrade") ||
-		resp.Header.Get("Sec-Websocket-Accept") != computeAcceptKey(challengeKey) {
+		resp.Header.Get("Sec-WebSocket-Accept") != computeAcceptKey(challengeKey) {
 		// Before closing the network connection on return from this
 		// function, slurp up some of the response to aid application
 		// debugging.
@@ -354,7 +354,7 @@ func (d *Dialer) Dial(urlStr string, requestHeader http.Header) (*Conn, *http.Re
 	}
 
 	resp.Body = ioutil.NopCloser(bytes.NewReader([]byte{}))
-	conn.subprotocol = resp.Header.Get("Sec-Websocket-Protocol")
+	conn.subprotocol = resp.Header.Get("Sec-WebSocket-Protocol")
 
 	netConn.SetDeadline(time.Time{})
 
